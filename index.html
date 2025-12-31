@@ -2,7 +2,7 @@
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
-<title>Happy New Year Keya</title>
+<title>Happy New Year Keya 🤍</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;600&display=swap" rel="stylesheet">
@@ -68,6 +68,7 @@ body {
   text-align: center;
   box-shadow: 0 0 50px rgba(255,105,180,0.6);
   animation: fadeIn 3s ease;
+  display: none;
 }
 
 @keyframes fadeIn {
@@ -77,7 +78,6 @@ body {
 
 h2 {
   color: #ffb3d9;
-  margin-bottom: 10px;
 }
 
 #countdown {
@@ -103,27 +103,27 @@ p {
   position: fixed;
   width: 6px;
   height: 6px;
-  background: pink;
   border-radius: 50%;
-  animation: explode 1.5s linear forwards;
+  animation: explode 1.5s ease-out forwards;
+  will-change: transform, opacity;
 }
 
 @keyframes explode {
   from { transform: scale(1); opacity: 1; }
-  to { transform: scale(8); opacity: 0; }
+  to { transform: scale(9); opacity: 0; }
 }
 </style>
 </head>
 
 <body>
 
-<div id="intro" onclick="startExperience()">
+<div id="intro">
   <h1>Tap to Enter ✨</h1>
 </div>
 
 <div class="stars"></div>
 
-<div class="card" style="display:none" id="mainCard">
+<div class="card" id="mainCard">
   <h2>Keya, 🤍</h2>
 
   <div id="countdown">New Year আসছে…</div>
@@ -152,39 +152,62 @@ p {
 </audio>
 
 <script>
-function startExperience() {
-  document.getElementById("intro").style.display = "none";
-  document.getElementById("mainCard").style.display = "block";
-  document.getElementById("music").play();
-  setInterval(createFirework, 800);
-}
+const intro = document.getElementById("intro");
+const card = document.getElementById("mainCard");
+const music = document.getElementById("music");
+
+intro.addEventListener("click", () => {
+  intro.style.display = "none";
+  card.style.display = "block";
+  music.play();
+  setInterval(createFirework, 900);
+});
 
 function createFirework() {
   const fw = document.createElement("div");
   fw.className = "firework";
   fw.style.left = Math.random() * window.innerWidth + "px";
   fw.style.top = Math.random() * window.innerHeight + "px";
+  fw.style.background = `hsl(${Math.random()*360},80%,70%)`;
   document.body.appendChild(fw);
   setTimeout(() => fw.remove(), 1500);
 }
 
-// COUNTDOWN
+/* COUNTDOWN + NEW YEAR BLAST */
+let newYearFired = false;
 const newYear = new Date("January 1, 2026 00:00:00").getTime();
+
 setInterval(() => {
-  const now = new Date().getTime();
+  const now = Date.now();
   const d = newYear - now;
-  if (d < 0) {
-    document.getElementById("countdown").innerHTML = "🎆 Happy New Year, Keya 🤍";
+
+  if (d <= 0 && !newYearFired) {
+    newYearFired = true;
+
+    document.getElementById("countdown").innerHTML =
+      "🎆 Happy New Year, Keya 🤍";
+
+    music.currentTime = 0;
+    music.play();
+
+    for (let i = 0; i < 100; i++) {
+      setTimeout(createFirework, i * 40);
+    }
     return;
   }
-  const days = Math.floor(d / (1000 * 60 * 60 * 24));
-  const h = Math.floor((d % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  const m = Math.floor((d % (1000 * 60 * 60)) / (1000 * 60));
-  const s = Math.floor((d % (1000 * 60)) / 1000);
-  document.getElementById("countdown").innerHTML =
-    `${days}d ${h}h ${m}m ${s}s`;
+
+  if (d > 0) {
+    const days = Math.floor(d / (1000 * 60 * 60 * 24));
+    const h = Math.floor((d / (1000 * 60 * 60)) % 24);
+    const m = Math.floor((d / (1000 * 60)) % 60);
+    const s = Math.floor((d / 1000) % 60);
+
+    document.getElementById("countdown").innerHTML =
+      `${days}d ${h}h ${m}m ${s}s`;
+  }
 }, 1000);
 </script>
 
 </body>
 </html>
+
